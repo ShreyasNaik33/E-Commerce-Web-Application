@@ -339,6 +339,11 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
+        /* Dedicated Mobile Sub-Header Navigation Bar */
+        .mobile-subnav-bar {
+            display: none;
+        }
+
         /* Layout Container */
         main {
             max-width: 1320px;
@@ -1031,18 +1036,44 @@
             }
 
             .nav-links {
-                display: flex;
-                overflow-x: auto;
-                max-width: 100%;
-                gap: 4px;
-                padding: 2px;
-                background: rgba(255, 255, 255, 0.04);
+                display: none !important;
             }
-            
-            .nav-item {
-                padding: 6px 12px;
-                font-size: 0.8rem;
-                white-space: nowrap;
+
+            .mobile-subnav-bar {
+                display: flex;
+                background: rgba(18, 22, 36, 0.95);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--border-color);
+                padding: 8px 12px;
+                gap: 8px;
+                position: sticky;
+                top: 65px;
+                z-index: 99;
+            }
+
+            .mobile-subnav-item {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: var(--radius-sm);
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid var(--border-color);
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: var(--transition-fast);
+                text-align: center;
+            }
+
+            .mobile-subnav-item.active {
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(6, 182, 212, 0.3));
+                border-color: var(--accent-cyan);
+                color: #fff;
+                box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
             }
 
             .mobile-bottom-nav {
@@ -1180,6 +1211,22 @@
             </div>
         </div>
     </header>
+
+    <!-- Dedicated Mobile View Sub-Header Navigation Bar -->
+    <div class="mobile-subnav-bar">
+        <div class="mobile-subnav-item active" onclick="switchView('store')" id="mobile-subnav-store">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            <span>Storefront</span>
+        </div>
+        <div class="mobile-subnav-item" onclick="switchView('tracking')" id="mobile-subnav-tracking">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Order Tracker</span>
+        </div>
+        <div class="mobile-subnav-item" onclick="switchView('admin')" id="mobile-subnav-admin" style="display: none;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Admin</span>
+        </div>
+    </div>
 
     <!-- Main View Switcher -->
     <main>
@@ -1777,14 +1824,17 @@
             document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
             document.querySelectorAll(".nav-item").forEach(nav => nav.classList.remove("active"));
             document.querySelectorAll(".mobile-nav-item").forEach(nav => nav.classList.remove("active"));
+            document.querySelectorAll(".mobile-subnav-item").forEach(nav => nav.classList.remove("active"));
 
             const targetView = document.getElementById(`view-${viewName}`);
             const targetNav = document.getElementById(`nav-${viewName}`);
             const targetMobileNav = document.getElementById(`mobile-nav-${viewName}`);
+            const targetMobileSubnav = document.getElementById(`mobile-subnav-${viewName}`);
 
             if (targetView) targetView.classList.add("active");
             if (targetNav) targetNav.classList.add("active");
             if (targetMobileNav) targetMobileNav.classList.add("active");
+            if (targetMobileSubnav) targetMobileSubnav.classList.add("active");
 
             if (viewName === 'tracking') {
                 renderAllOrdersTrackingList();
@@ -1816,8 +1866,12 @@
 
             const isAdmin = state.currentUser && state.currentUser.role === "Admin";
             document.getElementById("nav-admin").style.display = isAdmin ? "flex" : "none";
+            
             const mobileAdmin = document.getElementById("mobile-nav-admin");
             if (mobileAdmin) mobileAdmin.style.display = isAdmin ? "flex" : "none";
+
+            const mobileSubAdmin = document.getElementById("mobile-subnav-admin");
+            if (mobileSubAdmin) mobileSubAdmin.style.display = isAdmin ? "flex" : "none";
         }
 
         function renderProducts() {
