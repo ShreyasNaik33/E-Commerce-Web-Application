@@ -1,6 +1,6 @@
 # NEXUS // E-Commerce Web Application
 
-A single static file e-commerce web application with product catalog management, shopping cart, express checkout, order tracking, admin portal, and Indian Rupee (₹ INR) currency pricing. Built for direct deployment to Vercel.
+An e-commerce web application with product catalog management, shopping cart, express checkout, order tracking, admin portal, pricing.
 
 ![Nexus E-Commerce Platform](https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80)
 
@@ -16,14 +16,7 @@ A single static file e-commerce web application with product catalog management,
 - 🔐 **Admin Portal & Inventory Management**: Role switcher (Demo Customer / Demo Admin), revenue KPI stats, product add/edit/delete CRUD, and customer order status updates.
 - 🚀 **Zero-Config Vercel Deployment**: Everything (HTML, CSS, JS, database engine) is packed into `index.html` for single-click Vercel static deployment.
 
-## Quick Start
 
-1. Clone or download this repository.
-2. Open `index.html` in any web browser.
-3. Or deploy to Vercel:
-   ```bash
-   npx vercel
-   ```
 
 ## Technologies Used
 
