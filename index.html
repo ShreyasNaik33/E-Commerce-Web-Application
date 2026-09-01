@@ -705,7 +705,6 @@
             color: #fff;
         }
 
-        /* Order track hover row */
         .order-track-row:hover {
             background: rgba(255, 255, 255, 0.06) !important;
             border-color: var(--border-glow) !important;
@@ -990,6 +989,11 @@
             border-color: var(--accent-primary);
         }
 
+        /* Mobile Bottom Navigation Bar */
+        .mobile-bottom-nav {
+            display: none;
+        }
+
         /* Toast Notifications */
         .toast-container {
             position: fixed;
@@ -1020,30 +1024,121 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Media Queries */
+        /* Media Queries for Mobile Responsiveness */
         @media (max-width: 768px) {
+            .nav-container {
+                padding: 10px 16px;
+            }
+
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                max-width: 100%;
+                gap: 4px;
+                padding: 2px;
+                background: rgba(255, 255, 255, 0.04);
+            }
+            
+            .nav-item {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                white-space: nowrap;
+            }
+
+            .mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 64px;
+                background: rgba(10, 12, 20, 0.95);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid var(--border-color);
+                z-index: 190;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                padding: 0 8px;
+                box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+            }
+
+            .mobile-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3px;
+                color: var(--text-muted);
+                font-size: 0.72rem;
+                font-weight: 500;
+                padding: 6px 12px;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: var(--transition-fast);
+                flex: 1;
+            }
+
+            .mobile-nav-item.active {
+                color: var(--accent-cyan);
+                background: rgba(6, 182, 212, 0.12);
+            }
+
+            body {
+                padding-bottom: 74px;
+            }
+
             .hero-banner {
                 flex-direction: column;
-                padding: 28px 20px;
+                padding: 28px 18px;
                 text-align: center;
             }
+
             .hero-title {
                 font-size: 2rem;
             }
-            .nav-links {
-                display: none;
-            }
+
             .catalog-controls {
                 flex-direction: column;
                 align-items: stretch;
             }
+
+            .tracking-search {
+                flex-direction: column;
+            }
+
+            .tracking-card {
+                padding: 20px;
+            }
+
             .tracking-timeline {
                 flex-direction: column;
                 gap: 24px;
                 align-items: flex-start;
             }
+
             .tracking-timeline::before, .tracking-progress-line {
                 display: none;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 16px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .toast-container {
+                bottom: 78px;
+                right: 16px;
+                left: 16px;
+            }
+
+            .toast {
+                width: 100%;
             }
         }
     </style>
@@ -1261,6 +1356,22 @@
             </div>
         </section>
     </main>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <div class="mobile-nav-item active" onclick="switchView('store')" id="mobile-nav-store">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            <span>Storefront</span>
+        </div>
+        <div class="mobile-nav-item" onclick="switchView('tracking')" id="mobile-nav-tracking">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Order Tracker</span>
+        </div>
+        <div class="mobile-nav-item" onclick="switchView('admin')" id="mobile-nav-admin" style="display: none;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Admin</span>
+        </div>
+    </nav>
 
     <!-- Cart Drawer -->
     <div class="drawer-overlay" id="cart-drawer-overlay" onclick="toggleCart()">
@@ -1665,12 +1776,15 @@
             
             document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
             document.querySelectorAll(".nav-item").forEach(nav => nav.classList.remove("active"));
+            document.querySelectorAll(".mobile-nav-item").forEach(nav => nav.classList.remove("active"));
 
             const targetView = document.getElementById(`view-${viewName}`);
             const targetNav = document.getElementById(`nav-${viewName}`);
+            const targetMobileNav = document.getElementById(`mobile-nav-${viewName}`);
 
             if (targetView) targetView.classList.add("active");
             if (targetNav) targetNav.classList.add("active");
+            if (targetMobileNav) targetMobileNav.classList.add("active");
 
             if (viewName === 'tracking') {
                 renderAllOrdersTrackingList();
@@ -1688,19 +1802,22 @@
             if (isUser) {
                 const roleClass = state.currentUser.role === "Admin" ? "role-admin" : "role-user";
                 container.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="role-pill ${roleClass}">${state.currentUser.role}</span>
                         <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">${state.currentUser.name}</span>
                         <button class="btn-outline btn-sm" onclick="logout()" style="padding: 4px 8px;">Exit</button>
                     </div>
                 `;
-                document.getElementById("nav-admin").style.display = state.currentUser.role === "Admin" ? "flex" : "none";
             } else {
                 container.innerHTML = `
                     <button class="btn-glow btn-sm" onclick="openAuthModal()">Sign In</button>
                 `;
-                document.getElementById("nav-admin").style.display = "none";
             }
+
+            const isAdmin = state.currentUser && state.currentUser.role === "Admin";
+            document.getElementById("nav-admin").style.display = isAdmin ? "flex" : "none";
+            const mobileAdmin = document.getElementById("mobile-nav-admin");
+            if (mobileAdmin) mobileAdmin.style.display = isAdmin ? "flex" : "none";
         }
 
         function renderProducts() {
